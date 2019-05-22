@@ -110,7 +110,7 @@ rest() {
 update() {
     while [ ! -z "$1" ]; do
         new_record_json=$(rest "PUT" "zones/${zone_id}/records/${1}/${record_type}" "{\"rrset_ttl\": \"${new_ttl}\", \"rrset_values\": [\"${ext_ip}\"]}")
-        new_record_message=$(echo "$new_record_json" | jq -r.message)
+        new_record_message=$(echo "$new_record_json" | jq -r. message)
         if [ "$debug" = "yes" ]; then
             printf "new_record_json:\\n---\\n%s\\n---\\n\\n" "$new_record_json"
             printf "new_record_message:\\n---\\n%s\\n---\\n\\n" "$new_record_message"
@@ -128,7 +128,7 @@ update() {
 create() {
     while [ ! -z "$1" ]; do
         new_record_json=$(rest "POST" "zones/${zone_id}/records/${1}/${record_type}" "{\"rrset_ttl\": \"${new_ttl}\", \"rrset_values\": [\"${ext_ip}\"]}")
-        new_record_message=$(echo "$new_record_json" | jq -r.message)
+        new_record_message=$(echo "$new_record_json" | jq -r. message)
         if [ "$debug" = "yes" ]; then
             printf "new_record_json:\\n---\\n%s\\n---\\n\\n" "$new_record_json"
             printf "new_record_message:\\n---\\n%s\\n---\\n\\n" "$new_record_message"
