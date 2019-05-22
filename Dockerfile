@@ -3,6 +3,6 @@ FROM alpine
 RUN apk add --no-cache jq bash curl
 
 WORKDIR /app
-COPY gad entrypoint.sh ./
+COPY gad ./
 
-ENTRYPOINT [ "bash", "entrypoint.sh" ]
+ENTRYPOINT [ "bash", "gad" ]
