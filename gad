@@ -91,7 +91,7 @@ rest() {
         echo -e "Sending REST ${1} call to ${url}\n" 1>&2
 
         if [ ! -z "$3" ]; then
-            echo -e "with payload:\n---\n${3}\n---\n\n"
+            echo -e "with payload:\n---\n${3}\n---\n\n" 1>&2
         fi
     fi
 
