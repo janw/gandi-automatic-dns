@@ -2,11 +2,11 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-schedule=${SCHEDULE:-*/5* * * *}
+schedule=${SCHEDULE:-*/5 * * * *}
 args=${ADDITIONAL_ARGS:-}
-echo "Will run on crob schedule ${schedule}"
 
-if [ ! -z "$args"]; then
+echo "Will run on crob schedule ${schedule}"
+if [ ! -z "$args" ]; then
     echo "With additional arguments \"${args}\""
 fi
 
