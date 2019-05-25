@@ -3,7 +3,6 @@
 usage() {
     printf "\\nUsage: %s [-5] [-6] [-l TTL] [-f] [-t] [-e] [-v] [-s] [-i EXT_IF] -a APIKEY -d EXAMPLE.COM -r \"RECORD-NAMES\"
 
--5: Use Gandi's new LiveDNS platform
 -6: Update AAAA record(s) instead of A record(s)
 -l: Set a custom TTL on records (only supported on LiveDNS)
 -f: Force the creation of a new zonefile regardless of IP address or TTL discrepancy
@@ -24,6 +23,10 @@ RECORD-NAMES: A space-separated list of the name(s) of the A or AAAA record(s) t
 #
 # Process parameters
 #
+apikey=${GANDI_APIKEY:-}
+domain=${GANDI_DOMAIN:-}
+records=${GANDI_RECORDS:-}
+ttl=${GANDI_TTL:-}
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -42,7 +45,7 @@ while [ $# -gt 0 ]; do
     esac
     shift
 done
-if [ -z "$apikey" -o -z "$domain" -o -z "$records" ]; then
+if [ ! -n "$apikey" -o ! -n "$domain" -o ! -n "$records" ]; then
     usage
 fi
 if [ "$ipv6" = "yes" ]; then
@@ -110,7 +113,7 @@ rest() {
 update() {
     while [ ! -z "$1" ]; do
         new_record_json=$(rest "PUT" "zones/${zone_id}/records/${1}/${record_type}" "{\"rrset_ttl\": \"${new_ttl}\", \"rrset_values\": [\"${ext_ip}\"]}")
-        new_record_message=$(echo "$new_record_json" | jq -r. message)
+        new_record_message=$(echo "$new_record_json" | jq -r .message)
         if [ "$debug" = "yes" ]; then
             printf "new_record_json:\\n---\\n%s\\n---\\n\\n" "$new_record_json"
             printf "new_record_message:\\n---\\n%s\\n---\\n\\n" "$new_record_message"
@@ -128,7 +131,7 @@ update() {
 create() {
     while [ ! -z "$1" ]; do
         new_record_json=$(rest "POST" "zones/${zone_id}/records/${1}/${record_type}" "{\"rrset_ttl\": \"${new_ttl}\", \"rrset_values\": [\"${ext_ip}\"]}")
-        new_record_message=$(echo "$new_record_json" | jq -r. message)
+        new_record_message=$(echo "$new_record_json" | jq -r .message)
         if [ "$debug" = "yes" ]; then
             printf "new_record_json:\\n---\\n%s\\n---\\n\\n" "$new_record_json"
             printf "new_record_message:\\n---\\n%s\\n---\\n\\n" "$new_record_message"
@@ -156,9 +159,9 @@ check() {
         # If a custom TTL wasn't provided, just set it to the existing one.
         # If the record TTL is empty (because the record doesn't exist) and
         # no custom TTL was provided, set a default.
-        if [ -z "$record_ttl" -a -z "$ttl" ]; then
-            new_ttl="10800"
-        elif [ -z "$ttl" ]; then
+        if [ -z "$record_ttl" -a ! -n "$ttl" ]; then
+            new_ttl="600"
+        elif [ ! -n "$ttl" ]; then
             new_ttl="$record_ttl"
         else
             new_ttl="$ttl"
